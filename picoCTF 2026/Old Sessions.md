@@ -20,12 +20,16 @@ While inspecting the application, I noticed a reference to the */sessions* endpo
 
 The page displayed information about active sessions, including the session associated with my test account and another associated with the admin user.
 
+<img width="814" height="204" alt="immagine" src="https://github.com/user-attachments/assets/ca8712b6-aa5f-4abd-bf95-4bfca80f352b" />
 
 
 
 
 ### Exploitation
 Afterwards, I opened the developer tools and located the session cookie in the browser's storage. I replaced its value with the session identifier associated with the administrator account. After reloading the main page, the application recognized me as the administrator and showed the flag.
+
+<img width="647" height="221" alt="immagine" src="https://github.com/user-attachments/assets/e1888d1c-483d-4ebb-9635-f1b315284767" />
+
 
 ---
 
