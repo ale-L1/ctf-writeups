@@ -1,7 +1,7 @@
 # RabbitHole
 **Category:** OSINT
 
-## Introduction
+## Overview
 
 RabbitHole was an OSINT challenge that involved following a series of clues across different websites and platforms. The investigation started with a video game composer and gradually led to video game lore, social media posts, animation credits, and Japanese personal blogs.
 
