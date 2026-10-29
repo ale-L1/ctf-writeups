@@ -17,12 +17,15 @@ The vulnerability allowed an attacker to inject SQL expressions, making it possi
 #### Initial Reconnaissance
 As soon as we start the challenge instance, we're greeted by a page where we can either log in or sign up. After registering and logging in, we're redirected to our personal vault, where we can create secret notes.
 
-By clicking on "Create Secret", we can test a simple SQL injection payload and observe how the web application behaves. 
-
-
-
+By clicking on "Create New Secret", we can test a simple SQL injection payload and observe how the web application behaves. 
+```
+test'123
+```
 
 The application returns a detailed database error, providing useful information about the SQL query being executed.
+
+<img width="1017" height="190" alt="immagine" src="https://github.com/user-attachments/assets/7b95d0ac-4855-44c3-b53b-42c3dc480561" />
+
 
 From the error message, we can infer that the application is performing an INSERT operation. By examining the error more closely, we can also identify PostgreSQL as the underlying DBMS.
 
@@ -69,7 +72,15 @@ We can run a similar query against public.users:
 '|| (SELECT string_agg(column_name || ' (' || data_type || ')', ', ') FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'users') ||'
 ```
 
+
 By inspecting the results, we can determine which columns are relevant to our investigation. In particular, the secrets table contains the information needed to retrieve stored notes and associate them with their owners.
+
+Here we can see respectively the columns of the users table and the columns of the secrets table:
+
+<img width="1011" height="133" alt="immagine" src="https://github.com/user-attachments/assets/5b4adbe1-6fc0-4dc6-a29e-3f263fbb4062" />
+
+<img width="1019" height="140" alt="immagine" src="https://github.com/user-attachments/assets/b9ab172f-cb26-4122-9bd9-27d30a6c867c" />
+
 
 #### Retrieving Secret Notes
 
@@ -93,6 +104,7 @@ Since we've already discovered the public.users table, we can query its user IDs
 '|| (SELECT string_agg(id || '.' || username, ', ') FROM public.users) ||'
 ```
 
+
 By examining the returned results, we can identify the administrator's account and obtain the corresponding user ID.
 
 
@@ -101,10 +113,13 @@ By examining the returned results, we can identify the administrator's account a
 Now we can query the secrets table again, filtering the results by the administrator's ID:
 
 ```
-'|| (SELECT content FROM public.secrets WHERE owner_id = 'e2a66f7d-2ce6-4861-b4aa-be8e069601cb') ||'
+'|| (SELECT content FROM public.secrets WHERE owner_id = 'e2a66f7d-****-****-****-************') ||'
 ```
 
 This retrieves the content of the administrator's secret note, revealing the flag and completing the challenge.
+
+<img width="1021" height="145" alt="immagine" src="https://github.com/user-attachments/assets/18bd2678-b027-44d8-a63b-a155df38ba49" />
+
 
 ---
 
@@ -136,6 +151,6 @@ There are several ways to prevent this type of vulnerability:
 
 Although the challenge also provided the source code, I deliberately chose not to inspect it. Instead, I wanted to approach the challenge as a black-box assessment, relying exclusively on the application's observable behavior and the information exposed by its responses.
 
-I believe this approach provides a valuable learning experience. Rather than immediately locating the vulnerable code, we have to formulate hypotheses, test them, interpret database errors, enumerate the database structure, and gradually build an understanding of the application's behavior.
+I believe this approach provides a valuable learning experience. Rather than immediately locating the vulnerable code, I had to formulate hypotheses, test them, interpret database errors, enumerate the database structure, and gradually build an understanding of the application's behavior.
 
 For me, this was a great opportunity to practice SQL injection and develop a more methodical approach to web application security testing.
